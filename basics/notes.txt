@@ -19,3 +19,4 @@ webgraphviz.com
 terraform apply
 terraform apply example.plan
 terraform apply -auto-approve
+terraform apply -var="webserver_ami=ami-12345"
