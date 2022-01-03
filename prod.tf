@@ -17,7 +17,6 @@ variable "web_min_size" {
   type = number
 }
 
-//noinspection TFDuplicatedProvider
 provider "aws" {
   profile = "default"
   region  = "us-west-2"
@@ -69,6 +68,27 @@ resource "aws_security_group" "prod_web" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    "Terraform" : "true"
+  }
+}
+
+resource "aws_instance" "prod_web" {
+  ami           = "ami-03c8adc67e56c7f1d"
+  instance_type = "t2.nano"
+
+  vpc_security_group_ids = [
+    aws_security_group.prod_web.id
+  ]
+
+  tags = {
+    "Terraform" : "true"
+  }
+}
+
+resource "aws_eip" "prod_web" {
+  instance = aws_instance.prod_web.id
 
   tags = {
     "Terraform" : "true"

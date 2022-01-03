@@ -3,7 +3,7 @@ terraform init
 terraform plan
 terraform plan -help
 terraform plan -destroy
-terraform plan -destroy -out=example.plan
+terraform plan -destroy -out destroy.plan
 terraform show example.plan
 
 terraform state

@@ -23,9 +23,10 @@ resource "aws_launch_template" "this" {
   }
 }
 
-//noinspection ConflictingProperties
 resource "aws_autoscaling_group" "this" {
+  //noinspection ConflictingProperties
   availability_zones  = ["us-west-2a", "us-west-2b"]
+  //noinspection ConflictingProperties
   vpc_zone_identifier = var.subnets
   desired_capacity    = var.web_desired_capacity
   max_size            = var.web_max_size
