@@ -13,6 +13,7 @@ terraform show
 terraform show -json
 
 terraform graph
+terraform graph | grep -v -e 'meta' -e 'close' -e 's3' -e 'vpc'
 webgraphviz.com
 
 terraform apply

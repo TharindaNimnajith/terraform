@@ -46,6 +46,20 @@ resource "aws_default_subnet" "default_az2" {
   }
 }
 
+resource "aws_elb" "prod_web" {
+  name            = "prod_web"
+  instances       = aws_instance.prod_web.*.id
+  # instances     = aws_instance.prod_web[*].id
+  subnets         = [aws_default_subnet.default_az1.id, aws_default_subnet.default_az2.id]
+  security_groups = [aws_security_group.prod_web.id]
+  listener {
+    instance_port     = 0
+    instance_protocol = "http"
+    lb_port           = 0
+    lb_protocol       = "http"
+  }
+}
+
 resource "aws_security_group" "prod_web" {
   name        = "prod_web"
   description = "Allow standard http and https ports inbound and everything outbound"
@@ -75,6 +89,8 @@ resource "aws_security_group" "prod_web" {
 }
 
 resource "aws_instance" "prod_web" {
+  count = 2
+
   ami           = "ami-03c8adc67e56c7f1d"
   instance_type = "t2.nano"
 
@@ -93,6 +109,47 @@ resource "aws_eip" "prod_web" {
   tags = {
     "Terraform" : "true"
   }
+}
+
+resource "aws_eip_association" "prod_web" {
+  instance_id   = aws_instance.prod_web.0.id
+  # instance_id = aws_instance.prod_web[0].id
+  allocation_id = aws_eip.prod_web.id
+}
+
+
+resource "aws_launch_template" "prod_web" {
+  name_prefix   = "prod_web"
+  image_id      = "ami-03c8adc67e56c7f1d"
+  instance_type = "t2.micro"
+  tags          = {
+    "Terraform" : "true"
+  }
+}
+
+resource "aws_autoscaling_group" "prod_web" {
+  //noinspection ConflictingProperties
+  availability_zones  = ["us-west-2a", "us-west-2b"]
+  //noinspection ConflictingProperties
+  vpc_zone_identifier = [aws_default_subnet.default_az1.id, aws_default_subnet.default_az2.id]
+  desired_capacity    = 1
+  max_size            = 1
+  min_size            = 1
+
+  launch_template {
+    id      = aws_launch_template.prod_web.id
+    version = "$Latest"
+  }
+  tag {
+    key                 = "Terraform"
+    value               = "true"
+    propagate_at_launch = true
+  }
+}
+
+resource "aws_autoscaling_attachment" "prod_web" {
+  autoscaling_group_name = aws_autoscaling_group.prod_web.id
+  elb                    = aws_elb.prod_web.id
 }
 
 module "web_app" {
