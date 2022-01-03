@@ -17,6 +17,7 @@ variable "web_min_size" {
   type = number
 }
 
+//noinspection TFDuplicatedProvider
 provider "aws" {
   profile = "default"
   region  = "us-west-2"
@@ -25,7 +26,7 @@ provider "aws" {
 resource "aws_s3_bucket" "prod_tf_course" {
   bucket = "tf-course-20191118"
   acl    = "private"
-  tags = {
+  tags   = {
     "Terraform" : "true"
   }
 }
@@ -34,14 +35,14 @@ resource "aws_default_vpc" "default" {}
 
 resource "aws_default_subnet" "default_az1" {
   availability_zone = "us-west-2a"
-  tags = {
+  tags              = {
     "Terraform" : "true"
   }
 }
 
 resource "aws_default_subnet" "default_az2" {
   availability_zone = "us-west-2b"
-  tags = {
+  tags              = {
     "Terraform" : "true"
   }
 }
@@ -75,14 +76,14 @@ resource "aws_security_group" "prod_web" {
 }
 
 module "web_app" {
-  source = "./modules/web_app"
+  source = "./web_app"
 
   web_image_id         = var.web_image_id
   web_instance_type    = var.web_instance_type
   web_desired_capacity = var.web_desired_capacity
   web_max_size         = var.web_max_size
   web_min_size         = var.web_min_size
-  subnets              = [aws_default_subnet.default_az1.id,aws_default_subnet.default_az2.id]
+  subnets              = [aws_default_subnet.default_az1.id, aws_default_subnet.default_az2.id]
   security_groups      = [aws_security_group.prod_web.id]
-  web_app	       = "prod"
+  web_app              = "prod"
 }
