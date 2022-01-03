@@ -1,1 +1,20 @@
 terraform init
+
+terraform plan
+terraform plan -help
+terraform plan -destroy
+terraform plan -destroy -out=example.plan
+terraform show example.plan
+
+terraform state
+terraform state list
+terraform state show aws_security_group.prod_web
+terraform show
+terraform show -json
+
+terraform graph
+webgraphviz.com
+
+terraform apply
+terraform apply example.plan
+terraform apply -auto-approve
